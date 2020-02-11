@@ -1,95 +1,107 @@
 let dnotes
 
-function print(value) {
-    console.log(value)
-    return value
+function print (value) {
+  console.log(value)
+  return value
 }
 
-function q(selector) {
-    return document.querySelector(selector)
+function q (selector) {
+  return document.querySelector(selector)
 }
 
-function getForm() {
-    return document.querySelector('form')
+function getForm () {
+  return document.querySelector('form')
 }
 
-function getAllDnotes() {
-    return fetch('http://localhost:3000/notes', {
-            method: 'GET'
-        })
-        .then(response => response.json())
-        .then(data => console.log(data))
-        .then(data => {
-            dnotes = data
-            console.log(dnotes)
-            return dnotes
-        })
-
+function getAllDnotes () {
+  return fetch('http://localhost:3000/notes', {
+    method: 'GET'
+  })
+    .then(response => response.json())
+    .then(data => {
+      dnotes = data
+      console.log(dnotes)
+      return (renderDnotesList(dnotes))
+    })
 }
 
-function createDnotesHTML(dnotes) {
-    let dnotesStr = '<ul id="dnotes-list">'
-        // for (const dnote of dnotes) {
-        //     dnotesStr += createDnoteHTML(dnote)
-        // }
-        // dnotesStr += '</ul>'
-    return dnotesStr
+function createDnotesHTML (dnotes) {
+  console.log(dnotes)
+  let dnotesStr = '<ul id="dnotes-list">'
+  for (const dnote of dnotes) {
+    dnotesStr += createDnoteHTML(dnote)
+  }
+  dnotesStr += '</ul>'
+  return dnotesStr
 }
 
-function createDnoteHTML(dnote) {
-    return `<li data-dnote-id="${dnote.id}">${dnote.dnote} <button class="delete">Delete</button></li>`
+function createDnoteHTML (dnote) {
+  return `<li data-dnote-id="${dnote.id}">${dnote.dnote} <button class="delete">Delete</button></li>`
 }
 
-function postNewDnote(dnoteText) {
-    return fetch('http://localhost:3000/todos/'), {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                dnote: dnoteText,
-                done: false,
-                created: moment().format()
-            })
-        }
-        .then(response => response.json())
+function postNewDnote (dnoteText) {
+  return fetch('http://localhost:3000/notes/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      dnote: dnoteText,
+      done: false,
+      created: moment().format()
+    })
+  })
+    .then(response => response.json())
 }
 
-function renderDnotesList(dnotes) {
-    const dnotesHTML = createDnotesHTML(dnotes)
-    const dnotesSection = document.querySelector('#dnotes')
-    dnotesSection.innerHTML = dnotesHTML
+function renderDnotesList (dnotes) {
+  console.log(dnotes)
+  const dnotesHTML = createDnotesHTML(dnotes)
+  const dnotesSection = document.querySelector('#dnotes')
+  dnotesSection.innerHTML = dnotesHTML
 }
 
-function renderNewDnote(dnote) {
-    const dnoteHTML = createDnoteHTML(dnote)
-    const dnoteList = document.querySelector('#dnote-list')
-    dnoteList.insertAdjacentHTML('beforeend', todoHTML)
+function renderNewDnote (dnote) {
+  const dnoteHTML = createDnoteHTML(dnote)
+  const dnoteList = document.querySelector('#dnote-list')
+  dnoteList.insertAdjacentHTML('beforeend', dnoteHTML)
 }
-
-
 
 q('#new-dnote-form').addEventListener('submit', event => {
-    event.preventDefault()
-    const dnoteTextField = q('#dnote-text')
-    const dnoteText = todoTextField.value
-    dnoteTextField.value = ''
-    postNewDnote(dnoteText).then(renderNewDnote)
+  event.preventDefault()
+  const dnoteTextField = q('#dnote-text')
+  const dnoteText = dnoteTextField.value
+  dnoteTextField.value = ''
+  postNewDnote(dnoteText).then(renderNewDnote)
 })
 
 q('#dnotes').addEventListener('click', event => {
-    if (event.target.matches('delete')) {
-        print('delete ' + event.target.parentElement.dataset.dnoteId)
-    }
+  console.log('delete')
+  if (event.target.matches('.delete')) {
+    console.log('delete ' + event.target.parentElement.dataset.dnoteId)
+    return fetch(`http://localhost:3000/notes/${event.target.parentElement.dataset.dnoteId}`, {
+      method: 'DELETE'
+    })
+  }
 })
 
+// function getAllDnotes() {
+//     return fetch('http://localhost:3000/notes', {
+//             method: 'GET'
+//         })
+//         .then(response => response.json())
+//         .then(data => {
+//             dnotes = data
+//             console.log(dnotes)
+//             return (renderDnotesList(dnotes))
+//         })
+// }
 
-getAllDnotes().then(renderDnotesList(dnotes))
+getAllDnotes()
 
+// todosApi.getAll().then(renderTodosList)
 
-
-
-//Help from Brandon. Started assignment again above after catchup session with Amy. 
+// Help from Brandon. Started assignment again above after catchup session with Amy.
 
 // let editTextBox = q("#note-text")
 // let editInput = q("edit-text")
@@ -124,7 +136,7 @@ getAllDnotes().then(renderDnotesList(dnotes))
 // }
 
 // function createNoteHTML(note) {
-//     return `<li class="title" data-node-id="${note.id}">${note.title}</li>   
+//     return `<li class="title" data-node-id="${note.id}">${note.title}</li>
 //     <li data-note-id="${note.id}">${note.note} <button class="edit">Edit</button><button class="delete">Delete</button></li>`
 // }
 
@@ -222,4 +234,4 @@ getAllDnotes().then(renderDnotesList(dnotes))
 
 // console.log("Everything is functional")
 
-//})
+// })
